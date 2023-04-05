@@ -1,3 +1,10 @@
+InputFiles
+IntermediateOutputs
+OutputFiles
+Project_pb2_grpc.py
+Project_pb2.py
+CSE530 DSCD W23 Project.pdf
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
