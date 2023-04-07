@@ -9,6 +9,7 @@ import threading
 class MapperServicer(Project_pb2_grpc.MapperServicer):
     def map(self, request, context):
         shardList = request.shards
+        print("Received {} shards".format(shardList))
 
         mapWorkers = []
         for mapperID in range(len(shardList)):
@@ -48,7 +49,7 @@ def mapper(mapperID, shardContents):
     emission = []
     for shardContent in shardContents:
         for word in shardContent[1].split():
-            emission.append([word, 1])
+            emission.append([word.lower(), 1])
 
     saveIntermediateOutput(mapperID, emission)
     return emission
