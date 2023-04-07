@@ -68,8 +68,9 @@ def getSortedData(partitionData):
                     break
             if not found:
                 temp.append([item[0], [item[1]]])
-        sortedData = temp
-        sortedData.sort(key=lambda x: x[0])
+    
+    sortedData = temp
+    sortedData.sort(key=lambda x: x[0])
 
     return sortedData
 
