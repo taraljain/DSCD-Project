@@ -3,7 +3,7 @@ import grpc
 from concurrent import futures
 import Project_pb2
 import Project_pb2_grpc
-import threading
+import multiprocessing
 
 
 class MapperServicer(Project_pb2_grpc.MapperServicer):
@@ -14,7 +14,7 @@ class MapperServicer(Project_pb2_grpc.MapperServicer):
         mapWorkers = []
         for mapperID in range(len(shardList)):
             shardContents = getShardContents(request.inputDataLocation, shardList[mapperID].files)
-            mapWorkers.append(threading.Thread(target=mapper, args=(mapperID, shardContents)))
+            mapWorkers.append(multiprocessing.Process(target=mapper, args=(mapperID, shardContents)))
 
         for mapWorker in mapWorkers:
             mapWorker.start()

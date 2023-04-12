@@ -3,7 +3,7 @@ import grpc
 from concurrent import futures
 import Project_pb2
 import Project_pb2_grpc
-import threading
+import multiprocessing
 
 
 class ReducerServicer(Project_pb2_grpc.ReducerServicer):
@@ -26,7 +26,7 @@ class ReducerServicer(Project_pb2_grpc.ReducerServicer):
 
         reducerWorkers = []
         for partitionNumber, partitionData in partitionsData.items():
-            reducerWorkers.append(threading.Thread(target=reducer, args=(partitionNumber, partitionData, request.finalOutputDataLocation)))
+            reducerWorkers.append(multiprocessing.Process(target=reducer, args=(partitionNumber, partitionData, request.finalOutputDataLocation)))
 
         for reducerWorker in reducerWorkers:
             reducerWorker.start()
