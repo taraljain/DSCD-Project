@@ -23,6 +23,13 @@ message ShardList
     repeated Shard shards=1;
 }
 
+message RequestReducer
+{
+    int32 numberOfReducers = 1;
+    string intermediateOutputDataLocation = 2;
+    string finalOutputDataLocation = 3;
+}
+
 message RequestMapper {
     string inputDataLocation = 1;
     repeated ShardList shardlist = 2;
@@ -30,6 +37,11 @@ message RequestMapper {
 
 service Mapper {
     rpc map( RequestMapper) returns (Response) {}
+}
+
+service Reducer
+{
+    rpc reduce(RequestReducer) returns (Response) {}
 }
 
 service Master {

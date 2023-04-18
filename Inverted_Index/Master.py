@@ -12,26 +12,18 @@ class MasterServicer(Project_pb2_grpc.MasterServicer):
         with grpc.insecure_channel('localhost:6000') as channel:
             stub=Project_pb2_grpc.MapperStub(channel)
 
-            shard_data=[[] for i in range(0,len(shardList))]
 
-            # Project_pb2.Shard(document_id = shard[0],filename=shard[1]) for shard in shardList
-            for i in range(0,len(shardList)):
-                for j in range(0,len(shardList[i])):
-                    
-                    shard_item=Project_pb2.Shard(document_id = shardList[i][j][0],filename=shardList[i][j][1])
-
-                    shard_data[i].append(shard_item)
-
-            print(type(shard_data))
-
-            shard_data=[Project_pb2.ShardList(shards=data) for data in shard_data]
-
-            print(type(shard_data))
+            shard_data=[Project_pb2.ShardList(shards=data) for data in shardList]
 
             request_data=Project_pb2.RequestMapper(inputDataLocation=request.inputDataLocation,shardlist = shard_data)
             response=stub.map(request_data)
 
             print(f"Response from Mapper {response}")
+
+        with grpc.insecure_channel('localhost:7000') as channel:
+            stub = Project_pb2_grpc.ReducerStub(channel)
+            response = stub.reduce(Project_pb2.RequestReducer(numberOfReducers=request.numberOfReducers, intermediateOutputDataLocation="./IntermediateOutputs", finalOutputDataLocation=request.outputDataLocation))
+            print("Response from Reducer: {}".format(response))
 
 
         return Project_pb2.Response(success=True)
@@ -56,7 +48,7 @@ def generateShardInput(numMappers, inputDir):
         ith_mapper=[]
         # append file with it's document ID in the list
         for j in range(start,end):
-            element=(get_document_id(fileList[j]),fileList[j])
+            element=Project_pb2.Shard(document_id=get_document_id(fileList[j]),filename=fileList[j])
             ith_mapper.append(element)
         
         shardList.append(ith_mapper)
