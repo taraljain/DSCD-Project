@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+message File {
+  int32 id = 1;
+  string location = 2;
+}
+message Shard {
+  repeated File files = 1;
+}
+
+message MasterRequest {
+    string inputLocation = 1;
+    int32 mappersCount = 2;
+    int32 reducersCount = 3;
+    string outputLocation = 4;
+}
+message MapperRequest {
+    repeated Shard shards = 1;
+    int32 mappersCount = 2;
+    int32 reducersCount = 3;
+}
+message ReducerRequest {
+    repeated string intermediateLocations = 1;
+    string outputLocation = 2;
+    int32 reducersCount = 3;
+}
+
+
+message MasterResponse {
+  bool status = 1;
+}
+message MapperResponse {
+  bool status = 1;
+  repeated string intermediateLocations = 2;
+}
+message ReducerResponse {
+  bool status = 1;
+}
+
+service Master {
+    rpc naturalJoin(MasterRequest) returns (MasterResponse) {} 
+}
+service Mapper {
+    rpc mapper(MapperRequest) returns (MapperResponse) {}
+}
+service Reducer {
+    rpc reducer(ReducerRequest) returns (ReducerResponse) {}
+}
