@@ -25,17 +25,20 @@ class MasterServicer(Project_pb2_grpc.MasterServicer):
         shards_list = [[] for _ in range(mappersCount)]
         fileId = 0
         mapperId = 0
-        for subdir, dirs, files in os.walk(inputLocation):
-            filesPerMapper, extraFiles = divmod(len(files), mappersCount)       
+        for subdir, dirs, files in os.walk(inputLocation):     
             for file in files:
-                if fileId == (mapperId+1)*filesPerMapper + min(mapperId + 1, extraFiles):
-                    mapperId += 1
+                if "table1" not in file:
+                    continue
             
-                fileLocation = os.path.join(subdir, file)
-                shards_list[mapperId].append(Project_pb2.File(id = fileId, 
-                            location = fileLocation))
+                fileLocation1 = os.path.join(subdir, file)
+                fileLocation2 = fileLocation1.replace("table1", "table2")
+                shards_list[(fileId//2)%mappersCount].append(Project_pb2.File(id = fileId, 
+                            location = fileLocation1))
                 fileId += 1
-        
+                shards_list[(fileId//2)%mappersCount].append(Project_pb2.File(id = fileId, 
+                            location = fileLocation2))
+                fileId += 1
+                
         shards = [Project_pb2.Shard(files = shards_list[i]) for i in range(mappersCount)]
         return shards
     
